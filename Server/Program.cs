@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Server
@@ -34,7 +36,20 @@ namespace Server
 
             while(true)
             {
-               
+               Socket client = await socket.AcceptAsync();
+               System.Console.WriteLine("Client connected!");
+
+               ThreadPool.QueueUserWorkItem(async obj=>
+               {
+                   while(true)
+                   {
+                       byte[] buffer = new byte[65000];
+                       int size = await client.ReceiveAsync(buffer,SocketFlags.None);
+
+                       string data = Encoding.UTF8.GetString(buffer,0,size);
+                       System.Console.WriteLine( data);
+                   }
+               });
             }
         }
     }
