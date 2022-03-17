@@ -2,8 +2,10 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Shared.Models;
 
 namespace Server
 {
@@ -47,6 +49,8 @@ namespace Server
                        int size = await client.ReceiveAsync(buffer,SocketFlags.None);
 
                        string data = Encoding.UTF8.GetString(buffer,0,size);
+                       Request userRequest = JsonSerializer.Deserialize<Request>(data);
+                       
                        System.Console.WriteLine( data);
                    }
                });
