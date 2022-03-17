@@ -1,6 +1,11 @@
-﻿using System;
+﻿using Shared.Models;
+using Shared.Tools;
+using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace Client.Services
 {
@@ -16,20 +21,23 @@ namespace Client.Services
         {
             socket = new(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             ip = IPAddress.Parse(IPADD);
-            endPoint = new(ip, PORT);            
+            endPoint = new(ip, PORT);
+
+            socket.Connect(endPoint);
         }
         public async void HandleServerResponceAsync()
         {
-            
-            while (true)
-            {
-
-            }
+           
         }
 
-        public async void SendCredentialsToServerAsync()
-        {
+        public async void SendCredentialsToServerAsync(Request request)
+        {         
+            string data = JsonSerializer.Serialize(request);
+            byte[] dataInBytes = Encoding.UTF8.GetBytes(data);
 
+            await socket.SendAsync(dataInBytes, socketFlags: SocketFlags.None);
         }
+
+        
     }
 }
