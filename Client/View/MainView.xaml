@@ -50,9 +50,10 @@
                          Margin="40"
                          FontSize="30"
                          TextAlignment="Center"
+                         
                          VerticalContentAlignment="Center"
                          Background="LightGray"
-                         Text="{Binding Name}"/>
+                         Text="{Binding Name,Mode=TwoWay}"/>
                 <!--TextBox for Password-->
                 <TextBox Grid.Row="1" 
                          Margin="40"
