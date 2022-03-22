@@ -48,7 +48,7 @@ namespace Server
                         string data = Encoding.UTF8.GetString(buffer, 0, size);
                         Request userRequest = JsonSerializer.Deserialize<Request>(data);
 
-                        System.Console.WriteLine(userRequest.Credentials.Name);
+                        
                     }
                 });
             }
