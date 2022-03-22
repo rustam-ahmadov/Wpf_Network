@@ -15,6 +15,7 @@ namespace Client.ViewModel
         public MainViewModel(INetworkService NS)
         {
             networkService = NS;
+            networkService.HandleServerResponceAsync();
         }
 
         private RelayCommand _logIn;
@@ -36,6 +37,16 @@ namespace Client.ViewModel
             {
                 if (IsRequestAssign())
                     networkService.SendCredentialsToServerAsync(request);
+            }
+            ,
+            delegate { return true; }
+        );
+         private RelayCommand _loaded;
+        public RelayCommand Loaded => _loaded ??= new(
+
+            () =>
+            {
+                MessageBox.Show("Loaded");
             }
             ,
             delegate { return true; }
