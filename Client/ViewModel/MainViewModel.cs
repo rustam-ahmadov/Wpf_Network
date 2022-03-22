@@ -23,7 +23,7 @@ namespace Client.ViewModel
 
              () =>
              {
-                 if (IsRequestAssign())
+                 if (IsRequestAssign(RequestTypes.LOGIN))
                      networkService.SendCredentialsToServerAsync(request);
              }
              ,
@@ -35,7 +35,7 @@ namespace Client.ViewModel
 
             () =>
             {
-                if (IsRequestAssign())
+                if (IsRequestAssign(RequestTypes.CREATE))
                     networkService.SendCredentialsToServerAsync(request);
             }
             ,
@@ -52,12 +52,12 @@ namespace Client.ViewModel
             delegate { return true; }
         );
 
-        private bool IsRequestAssign()
+        private bool IsRequestAssign(RequestTypes requestTypes )
         {
             if (!string.IsNullOrEmpty(Name) && !string.IsNullOrEmpty(Password))
             {
                 var userCredentials = new UserCredentials(Name, Password);
-                request = new Request(userCredentials, requestTypes: RequestTypes.LOGIN);
+                request = new Request(userCredentials, requestTypes: requestTypes);
                 return true;
             }
             return false;

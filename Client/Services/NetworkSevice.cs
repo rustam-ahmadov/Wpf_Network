@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace Client.Services
 {
@@ -26,32 +27,21 @@ namespace Client.Services
         }
         public async void HandleServerResponceAsync()
         {
-            socket.Bind(endPoint);
-            socket.Listen();
-
-            while (true)
+            while (socket.Connected)
             {
-                Socket client = await socket.AcceptAsync();
-                System.Console.WriteLine("Client connected!");
 
-                ThreadPool.QueueUserWorkItem(async obj =>
-                {
-                    while (true)
-                    {
-                        byte[] buffer = new byte[65000];
-                        int size = await client.ReceiveAsync(buffer, SocketFlags.None);
+                byte[] buffer = new byte[65000];
+                int size = await socket.ReceiveAsync(buffer, SocketFlags.None);
 
-                        string data = Encoding.UTF8.GetString(buffer, 0, size);
-                        Request userRequest = JsonSerializer.Deserialize<Request>(data);
+                string data = Encoding.UTF8.GetString(buffer, 0, size);
+                object obj = JsonSerializer.Deserialize<object>(data);
 
-                        System.Console.WriteLine(userRequest.Credentials.Name);
-                    }
-                });
+                MessageBox.Show(obj?.ToString());
             }
-
+            
         }
 
-        public async void  SendCredentialsToServerAsync(Request request)
+        public async void SendCredentialsToServerAsync(Request request)
         {
             string data = JsonSerializer.Serialize<Request>(request);
             byte[] dataInBytes = Encoding.UTF8.GetBytes(data);
@@ -59,6 +49,6 @@ namespace Client.Services
             await socket.SendAsync(dataInBytes, socketFlags: SocketFlags.None);
         }
 
-        
+
     }
 }

@@ -5,12 +5,16 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Server.EntityFramework;
+using Server.Services;
 using Shared.Models;
 
 namespace Server
 {
     class Program
     {
+        
+        private static IEFCoreService efCoreService = new EFCoreService();
         private const int PORT = 8080;
         private const string IPADD = "127.0.0.1";
         private static Socket socket;
@@ -48,7 +52,27 @@ namespace Server
                         string data = Encoding.UTF8.GetString(buffer, 0, size);
                         Request userRequest = JsonSerializer.Deserialize<Request>(data);
 
-                        
+
+                        bool isUserAlreadyInDb = efCoreService.IsUserExistInDB(userRequest.Credentials);
+                        byte[] responseInBytes;
+
+                        if (userRequest.RequestTypes == Shared.Tools.RequestTypes.LOGIN)
+                        {
+                            string response = JsonSerializer.Serialize<string>(isUserAlreadyInDb.ToString());
+                            responseInBytes = Encoding.UTF8.GetBytes(response);
+                            await client.SendAsync(responseInBytes, SocketFlags.None);
+                        }
+                        else if (userRequest.RequestTypes == Shared.Tools.RequestTypes.CREATE)
+                        {
+                            if (isUserAlreadyInDb == true)
+                                responseInBytes = Encoding.UTF8.GetBytes("false");
+                            else{
+                                efCoreService.AddUserAsync(userRequest.Credentials);
+                                responseInBytes = Encoding.UTF8.GetBytes("true");
+                            }
+
+                            await client.SendAsync(responseInBytes, SocketFlags.None);
+                        }
                     }
                 });
             }
